@@ -1,0 +1,62 @@
+# Quantix — EditorConfig
+# https://editorconfig.org
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+[*.{json,yml,yaml,csproj,props,targets,slnx,xml,nuspec}]
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false
+
+[*.cs]
+# Usings
+dotnet_sort_system_directives_first = true
+csharp_using_directive_placement = outside_namespace:warning
+
+# Namespaces & modern syntax
+csharp_style_namespace_declarations = file_scoped:warning
+csharp_prefer_simple_using_statement = true:suggestion
+csharp_style_expression_bodied_methods = true:silent
+
+# Prefer concise member access (no this.)
+dotnet_style_qualification_for_field = false:warning
+dotnet_style_qualification_for_property = false:warning
+dotnet_style_qualification_for_method = false:warning
+dotnet_style_qualification_for_event = false:warning
+
+# Immutability
+dotnet_style_readonly_field = true:warning
+
+# 'var' usage
+csharp_style_var_for_built_in_types = false:silent
+csharp_style_var_when_type_is_apparent = true:silent
+
+# --- Quantix generator diagnostics (QTX category — defined in Layer 2, design ref: DESIGN.md section 9) ---
+dotnet_diagnostic.QTX0001.severity = error      # No handler for command/query/stream request
+dotnet_diagnostic.QTX0002.severity = error      # More than one handler for a single-handler message
+dotnet_diagnostic.QTX0003.severity = error      # Handler is abstract / not constructable
+dotnet_diagnostic.QTX0004.severity = error      # Stream request with no stream handler
+dotnet_diagnostic.QTX0005.severity = warning    # Notification has no handlers
+dotnet_diagnostic.QTX0006.severity = error      # Ambiguous result type
+dotnet_diagnostic.QTX0007.severity = warning    # Duplicate [PipelineOrder] value
+dotnet_diagnostic.QTX0008.severity = error      # Handler Handle signature mismatch
+dotnet_diagnostic.QTX0009.severity = error      # Behavior closes over a non-Quantix-message type
+dotnet_diagnostic.QTX0010.severity = none       # Discovery info — opt-in via the <QuantixEmitDiscoveryInfo> MSBuild property
+dotnet_diagnostic.QTX0011.severity = warning    # Open-generic handler with no concrete instantiation
+
+# --- Suppressions justified by the Quantix design ---
+# The message markers (ICommand, IQuery, INotification, IStreamRequest) are intentionally
+# empty marker interfaces — see DESIGN.md section 4.1 — so CA1040 does not apply.
+dotnet_diagnostic.CA1040.severity = none
+
+# Analyzer release tracking (RS2008) is deferred to the first published version; the
+# AnalyzerReleases.*.md files are added as a Layer 7 release task.
+dotnet_diagnostic.RS2008.severity = none

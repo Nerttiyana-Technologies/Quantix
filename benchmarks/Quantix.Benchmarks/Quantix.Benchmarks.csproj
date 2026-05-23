@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Quantix.Benchmarks — the BenchmarkDotNet suite (Layer 5 of docs/IMPLEMENTATION_PLAN.md).
+    Measures Quantix dispatch against a MediatR baseline. Run in Release; see the README for
+    the exact command line.
+  -->
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <!-- net10.0 only: the .NET 8 runtime is not installed on the dev machine, and a benchmark
+         exists to be run. Matches the same decision made for Quantix.IntegrationTests. -->
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- The Quantix abstractions, plus the generator wired in as an analyzer. -->
+    <ProjectReference Include="../../src/Quantix.Abstractions/Quantix.Abstractions.csproj" />
+    <ProjectReference Include="../../src/Quantix.Generator/Quantix.Generator.csproj"
+                      OutputItemType="Analyzer"
+                      ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" />
+    <PackageReference Include="MediatR" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,33 @@
+<Solution>
+
+  <Folder Name="/src/">
+    <Project Path="src/Quantix.Abstractions/Quantix.Abstractions.csproj" />
+    <Project Path="src/Quantix.Generator/Quantix.Generator.csproj" />
+    <Project Path="src/Quantix/Quantix.csproj" />
+  </Folder>
+
+  <Folder Name="/tests/">
+    <Project Path="tests/Quantix.Generator.Tests/Quantix.Generator.Tests.csproj" />
+    <Project Path="tests/Quantix.IntegrationTests/Quantix.IntegrationTests.csproj" />
+  </Folder>
+
+  <Folder Name="/benchmarks/">
+    <Project Path="benchmarks/Quantix.Benchmarks/Quantix.Benchmarks.csproj" />
+  </Folder>
+
+  <Folder Name="/samples/">
+    <Project Path="samples/Quantix.Sample.MinimalApi/Quantix.Sample.MinimalApi.csproj" />
+  </Folder>
+
+  <Folder Name="/solution items/">
+    <File Path=".editorconfig" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="nuget.config" />
+    <File Path="global.json" />
+    <File Path="README.md" />
+    <File Path="docs/DESIGN.md" />
+    <File Path="docs/IMPLEMENTATION_PLAN.md" />
+  </Folder>
+
+</Solution>
