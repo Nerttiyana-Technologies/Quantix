@@ -1,0 +1,63 @@
+name: Release
+
+# Triggered by pushing a version tag (for example `v1.0.0`). MinVer turns the tag
+# into the package version, the package is published to NuGet, and a GitHub
+# release is created. Cutting and pushing the tag is a manual maintainer action.
+#
+# Requires one repository secret: NUGET_API_KEY (a nuget.org API key scoped to
+# the Quantix package).
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write  # required to create the GitHub release
+
+jobs:
+  release:
+    name: Pack & publish to NuGet
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # MinVer must see the tag and full history to derive the release version.
+          fetch-depth: 0
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Restore
+        run: dotnet restore Quantix.slnx
+
+      - name: Build
+        run: dotnet build Quantix.slnx --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test Quantix.slnx --configuration Release --no-build --verbosity normal
+
+      - name: Pack
+        run: dotnet pack src/Quantix/Quantix.csproj --configuration Release --no-restore --output artifacts/release-package
+
+      - name: Push to NuGet
+        # The matching .snupkg symbol package in the same folder is pushed
+        # automatically alongside the .nupkg.
+        run: >
+          dotnet nuget push "artifacts/release-package/*.nupkg"
+          --api-key "${{ secrets.NUGET_API_KEY }}"
+          --source https://api.nuget.org/v3/index.json
+          --skip-duplicate
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >
+          gh release create "${{ github.ref_name }}"
+          artifacts/release-package/*.nupkg
+          artifacts/release-package/*.snupkg
+          --title "Quantix ${{ github.ref_name }}"
+          --generate-notes
+          --verify-tag

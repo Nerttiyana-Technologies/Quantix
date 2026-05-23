@@ -1,0 +1,113 @@
+name: CI
+
+# Build, test and pack on every push and pull request to main, plus the two
+# guard legs that protect Quantix's core promises: a Native-AOT publish of the
+# sample (the reflection-free guarantee) and a build under the .NET 8 SDK's
+# Roslyn 4.8 (the generator's compiled API floor).
+#
+# The benchmark regression run is deliberately NOT here — it lives in
+# benchmarks.yml so a noisy measurement can never block a pull request.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# A newer push to the same branch supersedes an in-flight run.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-test:
+    name: Build, test & pack
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # MinVer derives the package version from git history and tags, so the
+          # full history must be fetched — a shallow clone yields a wrong version.
+          fetch-depth: 0
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Restore
+        run: dotnet restore Quantix.slnx
+
+      - name: Build
+        run: dotnet build Quantix.slnx --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test Quantix.slnx --configuration Release --no-build --verbosity normal
+
+      - name: Pack
+        # EnablePackageValidation (set in Quantix.csproj) runs during pack, so this
+        # step also exercises the package-validation leg.
+        run: dotnet pack src/Quantix/Quantix.csproj --configuration Release --no-restore --output artifacts/ci-package
+
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: quantix-package
+          path: |
+            artifacts/ci-package/*.nupkg
+            artifacts/ci-package/*.snupkg
+          if-no-files-found: error
+
+  aot-publish:
+    name: Native AOT publish (sample)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Install Native AOT prerequisites
+        run: sudo apt-get update && sudo apt-get install -y clang zlib1g-dev
+
+      - name: AOT-publish the sample
+        # The sample sets PublishAot=true; the repo sets TreatWarningsAsErrors.
+        # Any trim or AOT warning therefore fails this job — that failing build
+        # IS the proof that Quantix introduces no runtime reflection.
+        run: >
+          dotnet publish samples/Quantix.Sample.MinimalApi/Quantix.Sample.MinimalApi.csproj
+          --configuration Release
+          --runtime linux-x64
+          --output artifacts/aot-sample
+
+      - name: Verify the native binary was produced
+        run: test -x artifacts/aot-sample/Quantix.Sample.MinimalApi
+
+  roslyn-floor:
+    name: Roslyn 4.8 floor (.NET 8 SDK)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up .NET (10.0 to pack, 8.0 to consume)
+        uses: actions/setup-dotnet@v4
+        with:
+          # The .NET 8 SDK ships Roslyn 4.8 — the version the generator is compiled
+          # against. global.json installs the 10.0 SDK used to pack.
+          dotnet-version: '8.0.100'
+          global-json-file: global.json
+
+      - name: Pack Quantix with the 10.0 SDK
+        run: dotnet pack src/Quantix/Quantix.csproj --configuration Release --output artifacts/floor-feed
+
+      - name: Build a net8.0 consumer with the .NET 8 SDK
+        run: bash .github/scripts/roslyn-floor-check.sh
