@@ -439,3 +439,6 @@ docs/
 
 # BenchmarkDotNet run artifacts
 BenchmarkDotNet.Artifacts/
+
+# Presentations
+presentations/
