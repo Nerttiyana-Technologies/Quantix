@@ -1,12 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <!--
-    Quantix.Sample.MinimalApi — reference usage of Quantix; AOT-published in CI.
-    Layer 6 of docs/IMPLEMENTATION_PLAN.md fills this in.
+    Quantix.Sample.MinimalApi — reference usage of Quantix; Native-AOT published in CI.
+
+    PublishAot proves the reflection-free guarantee end to end. With the repo-wide
+    TreatWarningsAsErrors, any trim or AOT warning fails the build — so a green AOT
+    publish IS the proof. CreateSlimBuilder and the request-delegate generator (auto-
+    enabled by PublishAot) keep the ASP.NET host AOT-clean; Quantix adds no reflection.
   -->
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
+    <PublishAot>true</PublishAot>
+    <InvariantGlobalization>true</InvariantGlobalization>
   </PropertyGroup>
 
   <ItemGroup>

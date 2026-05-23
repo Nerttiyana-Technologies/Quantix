@@ -32,6 +32,15 @@
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+
+    <!--
+      Package validation (L7-5): runs during 'dotnet pack'. With no baseline set it
+      validates that every claimed target framework has a compatible asset and that
+      the API surface is consistent across the lib/ TFMs. After v1.0.0 ships, add
+      <PackageValidationBaselineVersion>1.0.0</PackageValidationBaselineVersion> so it
+      also flags breaking changes against the last release.
+    -->
+    <EnablePackageValidation>true</EnablePackageValidation>
   </PropertyGroup>
 
   <ItemGroup>

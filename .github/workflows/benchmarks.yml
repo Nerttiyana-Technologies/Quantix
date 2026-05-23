@@ -1,0 +1,41 @@
+name: Benchmarks
+
+# The BenchmarkDotNet suite (Quantix vs MediatR). Kept off the pull-request path
+# on purpose: micro-benchmark numbers vary with the runner, and a noisy
+# measurement must never be able to block a merge. Run it on demand, and weekly
+# so a performance regression still surfaces on its own.
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * 1'  # Mondays, 06:00 UTC
+
+jobs:
+  benchmark:
+    name: Run BenchmarkDotNet
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Run benchmarks
+        run: >
+          dotnet run
+          --project benchmarks/Quantix.Benchmarks/Quantix.Benchmarks.csproj
+          --configuration Release
+          -- --filter '*'
+
+      - name: Upload benchmark results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-results
+          path: BenchmarkDotNet.Artifacts/**
+          if-no-files-found: warn
