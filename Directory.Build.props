@@ -1,0 +1,45 @@
+<Project>
+
+  <!--
+    Quantix — shared MSBuild configuration.
+
+    Applies to every project in the solution. Project-specific settings
+    (target frameworks, packaging, IsAotCompatible, IsRoslynComponent) live
+    in the individual .csproj files, layer by layer per docs/IMPLEMENTATION_PLAN.md.
+  -->
+
+  <PropertyGroup Label="Language">
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <!--
+      NU1900 ("could not fetch package vulnerability data") is environmental — it fires when
+      the NuGet audit cannot reach the feed (offline or air-gapped build). It is not a
+      code-quality signal, so it must not break the build. Genuine vulnerability findings
+      (NU1901-NU1904) are not exempted and still fail the build.
+    -->
+    <WarningsNotAsErrors>$(WarningsNotAsErrors);NU1900</WarningsNotAsErrors>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Build">
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
+    <UseArtifactsOutput>true</UseArtifactsOutput>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Defaults">
+    <!-- Single-package model (D6): only src/Quantix opts back in to packing. -->
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Metadata">
+    <Authors>Suresh Subramanian</Authors>
+    <Product>Quantix</Product>
+    <Copyright>Copyright (c) Suresh Subramanian</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+
+</Project>

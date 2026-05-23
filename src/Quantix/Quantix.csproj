@@ -1,0 +1,88 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Quantix — THE install-this package (D6, single package). A consumer installs exactly one
+    package, "Quantix", and gets both halves:
+      * the public abstractions  -> bundled into  lib/<tfm>/
+      * the generator + analyzer -> bundled into  analyzers/dotnet/cs/
+    Quantix.Abstractions and Quantix.Generator are never published on their own.
+
+    L3-6 decision: the generated dispatch code is fully self-contained — it needs no shared
+    runtime helper assembly — so Quantix's own assembly ships empty in v1. It is kept as the
+    reserved home for any future shared helpers (design section 5).
+  -->
+
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+    <IsAotCompatible>true</IsAotCompatible>
+
+    <!-- The one and only project in the solution that produces a NuGet package. -->
+    <IsPackable>true</IsPackable>
+    <PackageId>Quantix</PackageId>
+    <Description>A source-generated, AOT-friendly mediator for .NET. Zero runtime reflection: handler discovery, generic closing and dispatch all happen at compile time, so there is no startup scan, no per-call reflection, no trim or AOT warnings, and a missing handler is a build error rather than a runtime failure.</Description>
+    <PackageTags>mediator;mediatr;cqrs;source-generator;roslyn;aot;native-aot;trimming;reflection-free</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageProjectUrl>https://github.com/isureshsubramanian/Quantix</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/isureshsubramanian/Quantix.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+
+    <!-- SourceLink + reproducible build + a separate .snupkg symbol package (L3-8).
+         SourceLink for GitHub is in-box in the .NET SDK; only these switches are needed. -->
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- The public abstractions: a real reference (so the assembly resolves) with
+         PrivateAssets=all so it does not become a separate package dependency — its DLL is
+         bundled into lib/ by the _AddAbstractionsToPackage target below. -->
+    <ProjectReference Include="../Quantix.Abstractions/Quantix.Abstractions.csproj" PrivateAssets="all" />
+
+    <!-- The generator + navigation analyzer: built, but not referenced as an assembly; its DLL
+         is bundled into analyzers/dotnet/cs/ by the _AddGeneratorToPackage target below. -->
+    <ProjectReference Include="../Quantix.Generator/Quantix.Generator.csproj"
+                      ReferenceOutputAssembly="false"
+                      PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The bundled Quantix.Abstractions.dll needs this at run time, so Quantix declares it as
+         the package's one real dependency — it would not flow from the PrivateAssets=all
+         project reference above. -->
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+
+    <!-- The NuGet listing README, packed at the package root. -->
+    <None Include="../../README.md" Pack="true" PackagePath="/" Visible="false" />
+  </ItemGroup>
+
+  <!-- Bundle Quantix.Abstractions.dll and its XML doc into lib/<tfm>/, beside Quantix.dll. -->
+  <PropertyGroup>
+    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);_AddAbstractionsToPackage</TargetsForTfmSpecificBuildOutput>
+  </PropertyGroup>
+
+  <Target Name="_AddAbstractionsToPackage">
+    <ItemGroup>
+      <BuildOutputInPackage Include="@(ReferenceCopyLocalPaths)"
+                            Condition="'%(ReferenceCopyLocalPaths.Filename)' == 'Quantix.Abstractions' AND ('%(ReferenceCopyLocalPaths.Extension)' == '.dll' OR '%(ReferenceCopyLocalPaths.Extension)' == '.xml')" />
+    </ItemGroup>
+  </Target>
+
+  <!-- Bundle the generator + analyzer into analyzers/dotnet/cs/ (the convention NuGet loads
+       analyzers from). Runs once at pack time. -->
+  <Target Name="_AddGeneratorToPackage" BeforeTargets="_GetPackageFiles">
+    <MSBuild Projects="$(MSBuildThisFileDirectory)../Quantix.Generator/Quantix.Generator.csproj"
+             Targets="Build"
+             Properties="Configuration=$(Configuration)">
+      <Output ItemName="_QuantixGeneratorOutput" TaskParameter="TargetOutputs" />
+    </MSBuild>
+    <ItemGroup>
+      <None Include="@(_QuantixGeneratorOutput)"
+            Pack="true"
+            PackagePath="analyzers/dotnet/cs"
+            Visible="false" />
+    </ItemGroup>
+  </Target>
+
+</Project>

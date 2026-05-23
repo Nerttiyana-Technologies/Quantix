@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Quantix.IntegrationTests — runtime behavior through a real ServiceProvider:
+    Send / Publish / Stream, pipeline behaviors, lifetimes. The Quantix generator runs
+    on this project, so the tests exercise the real generated dispatcher.
+  -->
+
+  <PropertyGroup>
+    <!-- net10.0 only: net8.0 runtime testing is a CI concern (it can install that runtime). -->
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/Quantix.Abstractions/Quantix.Abstractions.csproj" />
+    <ProjectReference Include="../../src/Quantix.Generator/Quantix.Generator.csproj"
+                      OutputItemType="Analyzer"
+                      ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,54 @@
+<Project>
+
+  <!--
+    Quantix — Central Package Management.
+
+    Every <PackageReference> in the solution omits its Version; the version is
+    pinned here. Projects add their references layer by layer (see
+    docs/IMPLEMENTATION_PLAN.md). Versions below are pre-pinned best-known
+    stable releases and are reconfirmed when each layer adds the reference.
+  -->
+
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+  <!--
+    Roslyn — the generator's compile-time floor. CONFIRMED 2026-05-23.
+    The generator is developed and tested on Roslyn 5.3.0 (.NET SDK 10.0.208)
+    but COMPILED against 4.8.0 so it loads in every consumer SDK/IDE that can
+    build a net8.0 app. Do not call Roslyn 5.x-only APIs.
+  -->
+  <ItemGroup Label="Roslyn (generator)">
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" />
+  </ItemGroup>
+
+  <ItemGroup Label="Analyzers — API surface guards">
+    <PackageVersion Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="3.3.4" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" Version="3.3.4" />
+  </ItemGroup>
+
+  <ItemGroup Label="netstandard2.0 polyfills (generator)">
+    <PackageVersion Include="PolySharp" Version="1.14.1" />
+  </ItemGroup>
+
+  <ItemGroup Label="Dependency injection (runtime)">
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
+  </ItemGroup>
+
+  <ItemGroup Label="Testing">
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+    <PackageVersion Include="xunit" Version="2.9.2" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.2" />
+    <PackageVersion Include="Verify.Xunit" Version="28.7.0" />
+    <PackageVersion Include="Verify.SourceGenerators" Version="2.5.0" />
+  </ItemGroup>
+
+  <ItemGroup Label="Benchmarks">
+    <PackageVersion Include="BenchmarkDotNet" Version="0.14.0" />
+    <PackageVersion Include="MediatR" Version="12.4.1" />
+  </ItemGroup>
+
+</Project>

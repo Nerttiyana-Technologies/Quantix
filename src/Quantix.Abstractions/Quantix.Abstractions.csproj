@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Quantix.Abstractions — all hand-written public types: message / handler /
+    behavior interfaces, IMediator, delegates, attributes, options, exception.
+    Not packed standalone: its assembly is bundled into the Quantix package (D6).
+  -->
+
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+    <RootNamespace>Quantix</RootNamespace>
+    <Description>Quantix abstractions — message, handler and behavior interfaces, IMediator, and attributes.</Description>
+    <IsAotCompatible>true</IsAotCompatible>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- ServiceLifetime, used by QuantixOptions (design section 8.5). -->
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+
+    <!-- Bans runtime reflection APIs in this assembly — Quantix's reflection-free guarantee
+         (design section 10, L3-11). PrivateAssets=all so the analyzer never reaches consumers. -->
+    <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="BannedSymbols.txt" />
+  </ItemGroup>
+
+</Project>

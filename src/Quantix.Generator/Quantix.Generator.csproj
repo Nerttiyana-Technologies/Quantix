@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Quantix.Generator — the Roslyn IIncrementalGenerator, the navigation
+    analyzer, the pipeline-manifest emitter and all QTX diagnostics.
+
+    Targets netstandard2.0 — a hard Roslyn requirement, since the generator is
+    loaded into the compiler. It is COMPILED against Microsoft.CodeAnalysis.CSharp
+    4.8.0 (the confirmed floor) so it loads in every consumer SDK that can build a
+    net8.0 app; the dev/test toolchain is Roslyn 5.3.0. Do not call Roslyn
+    5.x-only APIs.
+
+    Not packed standalone: its assembly is bundled into the Quantix package under
+    analyzers/dotnet/cs (D6) — wired up in Layer 3.
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>Quantix.Generator</RootNamespace>
+    <Description>Quantix Roslyn incremental source generator, navigation analyzer and diagnostics.</Description>
+    <IsRoslynComponent>true</IsRoslynComponent>
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Roslyn — compile-time only; the compiler host provides these at run time. -->
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" PrivateAssets="all" />
+    <!-- Polyfills modern C# (records, init, required, nullable attributes) for netstandard2.0. -->
+    <PackageReference Include="PolySharp" PrivateAssets="all" />
+  </ItemGroup>
+
+</Project>

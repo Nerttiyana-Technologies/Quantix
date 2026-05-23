@@ -1,0 +1,3 @@
+T:System.Activator;Quantix is reflection-free: generated dispatch constructs every type with a direct 'new' (design section 10).
+M:System.Type.MakeGenericType(System.Type[]);Quantix closes generic types at compile time, never at run time (design section 10).
+M:System.Reflection.MethodBase.Invoke(System.Object,System.Object[]);Quantix invokes handlers by direct call, never by reflection (design section 10).
