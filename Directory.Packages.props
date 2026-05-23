@@ -51,4 +51,9 @@
     <PackageVersion Include="MediatR" Version="12.4.1" />
   </ItemGroup>
 
+  <ItemGroup Label="Versioning">
+    <!-- MinVer derives the version from git tags (see Directory.Build.props). -->
+    <PackageVersion Include="MinVer" Version="5.0.0" />
+  </ItemGroup>
+
 </Project>
