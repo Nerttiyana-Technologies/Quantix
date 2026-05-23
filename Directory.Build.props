@@ -42,4 +42,17 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
+  <PropertyGroup Label="Versioning">
+    <!--
+      MinVer derives the version from the nearest 'v*' git tag (e.g. tag v1.0.0 -> 1.0.0).
+      An untagged build becomes a 0.0.0-alpha pre-release. CI must check out with full
+      history and tags (fetch-depth: 0) for this to resolve correctly.
+    -->
+    <MinVerTagPrefix>v</MinVerTagPrefix>
+  </PropertyGroup>
+
+  <ItemGroup Label="Versioning">
+    <PackageReference Include="MinVer" PrivateAssets="all" />
+  </ItemGroup>
+
 </Project>
