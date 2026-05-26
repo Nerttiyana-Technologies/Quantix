@@ -51,6 +51,31 @@ public static class GeneratorTestHarness
     }
 
     /// <summary>
+    /// Runs the Quantix generator over the given source and returns the resulting compilation
+    /// — including the generator's emitted source files — so a test can assert that the emitted
+    /// code itself compiles cleanly. Use this when verifying compilability of the generated
+    /// dispatcher (for example regression tests for cast or naming bugs); use
+    /// <see cref="Run"/> when asserting on emission text or the generator's own diagnostics.
+    /// </summary>
+    /// <param name="source">The C# source to compile and run the generator over.</param>
+    /// <returns>The post-generation compilation.</returns>
+    public static Compilation Compile(string source)
+    {
+        SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(source);
+
+        CSharpCompilation compilation = CSharpCompilation.Create(
+            assemblyName: "QuantixGeneratorTests",
+            syntaxTrees: new[] { syntaxTree },
+            references: CollectReferences(),
+            options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+
+        GeneratorDriver driver = CSharpGeneratorDriver.Create(new QuantixGenerator().AsSourceGenerator());
+        driver.RunGeneratorsAndUpdateCompilation(compilation, out Compilation updated, out _);
+
+        return updated;
+    }
+
+    /// <summary>
     /// Collects metadata references for a test compilation: the base class library (every
     /// assembly in the running runtime's directory) plus the Quantix abstractions, located via
     /// known types so the assemblies are genuinely loaded.
