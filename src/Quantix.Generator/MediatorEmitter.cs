@@ -196,8 +196,15 @@ internal static class MediatorEmitter
             {
                 if (model.Messages[i].Kind == kind)
                 {
+                    // The cast goes via 'object' so the compiler accepts it for 'sealed' concrete
+                    // message types. A direct cast like ((Msg)command) is rejected as CS0030 when
+                    // 'command' is the generic interface ICommand<TResult>/IQuery<TResult>/
+                    // IStreamRequest<TResult> and 'Msg' is sealed — the compiler proves no
+                    // subclass can ever close the interface differently. The discriminator above
+                    // already proved the runtime type, so the through-object cast is sound and,
+                    // on reference types, generates the same single 'castclass' IL — zero cost.
                     writer.Line($"case {i}:");
-                    writer.Line($"    return {callExpression(i, $"(({model.Messages[i].MessageType}){parameterName})")};");
+                    writer.Line($"    return {callExpression(i, $"(({model.Messages[i].MessageType})(object){parameterName})")};");
                 }
             }
 

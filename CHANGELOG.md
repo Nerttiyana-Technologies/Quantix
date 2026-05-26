@@ -9,6 +9,24 @@ tagging a commit `v1.0.0` produces package version `1.0.0`.
 
 ## [Unreleased]
 
+_Nothing yet._
+
+## [1.0.1] - 2026-05-26
+
+### Fixed
+
+- The generated dispatcher emitted an illegal direct cast in the frozen
+  (large-message-set) routing path, breaking compilation for consumers whose
+  generic-interface messages (`ICommand<TResult>`, `IQuery<TResult>`,
+  `IStreamRequest<TResult>`) were declared `sealed` — the standard C# message
+  shape. The discriminator already proves the runtime type at that point, so
+  the cast now goes through `object` (zero cost on reference types, identical
+  IL). Pattern-chain routing (used below the message-count threshold) was
+  unaffected. A regression test in `AdaptiveDispatchTests` now compiles the
+  emitted source for the frozen path so this class of mistake cannot recur.
+
+## [1.0.0] - 2026-05-23
+
 The first release of Quantix — a source-generated, AOT-friendly mediator for .NET.
 Handler discovery, generic closing and dispatch all happen at compile time, so there
 is no startup scan, no per-call reflection, and no trim or AOT warnings.
@@ -35,9 +53,6 @@ is no startup scan, no per-call reflection, and no trim or AOT warnings.
 - A single NuGet package, `Quantix`, bundling the abstractions and the generator.
 - Native AOT and trimming support, with zero trim or AOT warnings.
 
-### Notes
-
-- On release, rename the `[Unreleased]` heading to `[1.0.0] - YYYY-MM-DD` and start a
-  fresh `[Unreleased]` section above it.
-
-[Unreleased]: https://github.com/isureshsubramanian/Quantix/commits/main
+[Unreleased]: https://github.com/isureshsubramanian/Quantix/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/isureshsubramanian/Quantix/releases/tag/v1.0.1
+[1.0.0]: https://github.com/isureshsubramanian/Quantix/releases/tag/v1.0.0
