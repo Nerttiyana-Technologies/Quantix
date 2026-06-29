@@ -1,4 +1,8 @@
-# Quantix
+<div align="center">
+
+<img src="header.png" alt=",Quantix is a clean-room, MIT-licensed mediator" />
+
+</div>
 
 > A source-generated, AOT-friendly mediator for .NET. Zero runtime reflection, linker-safe, fast.
 
