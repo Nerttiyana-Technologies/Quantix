@@ -20,7 +20,7 @@
     <IsPackable>true</IsPackable>
     <PackageId>Quantix</PackageId>
     <Description>A source-generated, AOT-friendly mediator for .NET. Zero runtime reflection: handler discovery, generic closing and dispatch all happen at compile time, so there is no startup scan, no per-call reflection, no trim or AOT warnings, and a missing handler is a build error rather than a runtime failure.</Description>
-    <PackageTags>mediator;mediatr;cqrs;source-generator;roslyn;aot;native-aot;trimming;reflection-free</PackageTags>
+    <PackageTags>mediator;cqrs;source-generator;roslyn;aot;native-aot;trimming;reflection-free</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageProjectUrl>https://github.com/isureshsubramanian/Quantix</PackageProjectUrl>
     <RepositoryUrl>https://github.com/isureshsubramanian/Quantix.git</RepositoryUrl>

@@ -11,7 +11,7 @@ namespace Quantix.Generator;
 
 /// <summary>
 /// The Quantix navigation analyzer. It ships in the same package as the generator and ends the
-/// MediatR "blindfold": at every <c>Send</c>, <c>Publish</c> or <c>Stream</c> call site it
+/// runtime-mediator "blindfold": at every <c>Send</c>, <c>Publish</c> or <c>Stream</c> call site it
 /// reports the informational diagnostic QTX0012 naming the handler — or, for a notification,
 /// the handlers — that the generated dispatcher runs for that message. The diagnostic is
 /// <see cref="DiagnosticSeverity.Info"/>, so it never affects a build; it answers the question
